@@ -43,7 +43,10 @@ const convertDistrictIntoResponse = (dbObject) => {
 app.get("/states", async (request, response) => {
   const getStates = `SELECT * FROM state ORDER BY state_id;`;
   const stateArr = await database.all(getStates);
-  response.send(stateArr.map((state) => convertStateIntoResponse(state)));
+  const result = stateArr.map((state) => {
+    return convertStateIntoResponse(state);
+  });
+  response.send(result);
 });
 //API 2
 app.get("/states/:stateId/", async (request, response) => {
@@ -56,9 +59,8 @@ app.get("/states/:stateId/", async (request, response) => {
 //API 3
 app.post("/districts/", async (request, response) => {
   const { districtName, stateId, cases, cured, active, deaths } = request.body;
-  const addDistrict = `INSERT INTO
-                     district(district_name,state_id,cases,cured,active,deaths)
-                        values '${districtName}',${stateId},${cases},${cured},${active},${deaths};`;
+  const addDistrict = `INSERT INTO district(district_name,state_id,cases,cured,active,deaths)
+                        values ('${districtName}',${stateId},${cases},${cured},${active},${deaths});`;
   await database.run(addDistrict);
   response.send("District Successfully Added");
 });
@@ -73,7 +75,7 @@ app.get("/districts/:districtId/", async (request, response) => {
 //API 5
 app.delete("/districts/:districtId/", async (request, response) => {
   const { districtId } = request.params;
-  const deleteDistrict = `DELETE district where district_id =${districtId};`;
+  const deleteDistrict = `DELETE FROM district where district_id =${districtId};`;
   await database.run(deleteDistrict);
   response.send("District Removed");
 });
